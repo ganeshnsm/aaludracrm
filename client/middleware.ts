@@ -1,14 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SESSION_COOKIE } from "@/lib/session";
+
+const SESSION_COOKIE = "session";
 
 const publicRoutes = ["/login", "/signup"];
-const protectedRoutes = ["/customer", "/dashboard"];
+const protectedPrefixes = ["/customer", "/dashboard"];
 
-export default function proxy(req: NextRequest) {
+export default function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
     const hasSession = Boolean(req.cookies.get(SESSION_COOKIE)?.value);
 
-    const isProtected = protectedRoutes.some(
+    const isProtected = protectedPrefixes.some(
         (r) => pathname === r || pathname.startsWith(`${r}/`),
     );
     const isPublic = publicRoutes.includes(pathname);
@@ -17,7 +18,7 @@ export default function proxy(req: NextRequest) {
         return NextResponse.redirect(new URL("/login", req.nextUrl));
     }
     if (isPublic && hasSession) {
-        return NextResponse.redirect(new URL("/customer", req.nextUrl));
+        return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
     }
     return NextResponse.next();
 }

@@ -1,57 +1,51 @@
+import { PartialType } from "@nestjs/mapped-types";
 import {
     IsEmail,
-    IsInt,
+    IsEnum,
     IsOptional,
     IsString,
     MaxLength,
+    MinLength,
 } from "class-validator";
+
+export enum CustomerStatus {
+    LEAD = "lead",
+    ACTIVE = "active",
+    INACTIVE = "inactive",
+}
 
 export class CreateCustomerDto {
     @IsString()
-    @MaxLength(100)
+    @MinLength(1)
+    @MaxLength(120)
     name: string;
 
     @IsEmail()
-    @MaxLength(150)
     email: string;
 
     @IsOptional()
     @IsString()
-    @MaxLength(20)
+    @MaxLength(40)
     phone?: string;
 
     @IsOptional()
     @IsString()
-    @MaxLength(150)
+    @MaxLength(160)
     company?: string;
 
     @IsOptional()
-    @IsInt()
-    company_id?: number;
+    @IsEnum(CustomerStatus)
+    status?: CustomerStatus;
 }
 
-export class UpdateCustomerDto {
+export class UpdateCustomerDto extends PartialType(CreateCustomerDto) {}
+
+export class ListCustomersQueryDto {
     @IsOptional()
     @IsString()
-    @MaxLength(100)
-    name?: string;
+    search?: string;
 
     @IsOptional()
-    @IsEmail()
-    @MaxLength(150)
-    email?: string;
-
-    @IsOptional()
-    @IsString()
-    @MaxLength(20)
-    phone?: string;
-
-    @IsOptional()
-    @IsString()
-    @MaxLength(150)
-    company?: string;
-
-    @IsOptional()
-    @IsInt()
-    company_id?: number;
+    @IsEnum(CustomerStatus)
+    status?: CustomerStatus;
 }
